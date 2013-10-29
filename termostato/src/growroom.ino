@@ -1,9 +1,9 @@
 /*
  * control de growroom 
  * pin usados digitales 3 (relay termostato) 5 (temp superior)
- * version 0.1 : temperatura am2301 1 termometro superior
- * version 0.2 : control relay 
  * version 0.3 : control relay termostato configurar maximo y margen 
+ * version 0.2 : control relay 
+ * version 0.1 : temperatura am2301 1 termometro superior
  */
 
 #include <dht.h>
@@ -115,9 +115,10 @@ void processMessage(){
 	       for(int i=0; i < MSG_LEN -3; i++){   
 	        command[i] = Serial.read();           
 	      }
-		  int pos;
 		  if(c==CONFIG_MAX && c2==CONFIG_MARGEN){
-			  Serial.print("config max temp");
+			  Serial.print("Configurando max temp ");
+			  temp_max = juntarChar(command[0],command[1]);
+			  margen = aEntero(command[2]);
 			  Serial.print(temp_max);
 			  Serial.print(" margen ");
 			  Serial.println(margen);
@@ -150,4 +151,21 @@ void termostato(){
 	  if(DHT.temperature>=temp_max && !termrele.isOn())termrele.releOn();
 	  else if(DHT.temperature<=temp_max-margen && termrele.isOn()) termrele.releOff();
 	
+}
+
+//utilidades
+int juntarChar(char h1,char h2){
+  int decenas = aEntero(h1);
+  int unidades = aEntero(h2);
+  int suma = (decenas * 10) + unidades; 
+  return suma;
+}
+
+
+int aEntero(char c){
+    int salida;
+    if( c >= '0' && c <= '9'){
+      salida = c - '0' ; // convert digits to a number
+    }
+    return salida;
 }
